@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans" 
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
+ <!-- 第一个定时任务 -->  
+    <!-- 加入需要执行的类 -->
+    <bean id="timingSchedule1" class="com.novo.controller.TimingGetData"/>
+    <!-- 加入定时执行的方法 -->
+    <bean id="timingScheduleJobDetail1" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <!-- 定时执行的类 -->
+        <property name="targetObject" ref="timingSchedule1"/>
+        <!-- 具体的方法 -->
+        <property name="targetMethod" value="execute1"/>
+    </bean>
+    <!-- 调度触发器，设置自己想要的时间规则 -->
+    <bean id="timingScheduleTrigger1" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <!-- 加入相关的执行类和方法 -->
+        <property name="jobDetail" ref="timingScheduleJobDetail1"/>
+        <!-- 设置时间规则 （为了方便测试，设置成一分钟一次。具体的规则见详情）-->
+        <property name="cronExpression" value="0 0 */1 * * ?"/>
+    </bean>
+    <!-- 第二个定时任务 -->  
+    <!-- 加入需要执行的类 -->
+    <bean id="timingSchedule2" class="com.novo.controller.TimingGetData"/>
+    <!-- 加入定时执行的方法 -->
+    <bean id="timingScheduleJobDetail2" class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <!-- 定时执行的类 -->
+        <property name="targetObject" ref="timingSchedule2"/>
+        <!-- 具体的方法 -->
+        <property name="targetMethod" value="execute2"/>
+    </bean>
+    <!-- 调度触发器，设置自己想要的时间规则 -->
+    <bean id="timingScheduleTrigger2" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <!-- 加入相关的执行类和方法 -->
+        <property name="jobDetail" ref="timingScheduleJobDetail2"/>
+        <!-- 设置时间规则 （为了方便测试，设置成一分钟一次。具体的规则见详情）-->
+        <property name="cronExpression" value="0 */10 * * * ?"/>
+    </bean>
+
+    <!-- 加入调度工厂 ,设置调度触发器即可-->
+    <bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean" destroy-method="destroy" autowire="no">
+        <property name="triggers">
+            <list>
+                <ref bean="timingScheduleTrigger1"/>
+                <ref bean="timingScheduleTrigger2"/>
+            </list>
+        </property>
+        <property name="configLocation" value="classpath:quartz.properties"/>
+    </bean>
+</beans>
